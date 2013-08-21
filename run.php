@@ -16,7 +16,7 @@ if (empty($_SERVER['argv'][1])) die('Scriptr file $_SERVER[\'argv\'][1] not defi
 
 $path = $_SERVER['argv'][1].'.php';
 foreach (['NGN_PATH', 'NGN_ENV_PATH'] as $v) $path = str_replace($v, constant($v), $path);
-if ($path[0] == '/') $path = $path;
+if ($path[0] == '/' or $path[0] == '~');
 else $path = __DIR__.'/run/'.$path;
 
 require_once $path;
