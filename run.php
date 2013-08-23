@@ -10,14 +10,31 @@ define('LOGS_PATH', __DIR__.'/logs');
 define('RUN_PATH', __DIR__);
 
 Lib::addFolder(__DIR__.'/lib');
-Lib::addFolder(NGN_ENV_PATH.'/scripts/web/site/lib');
 
-if (empty($_SERVER['argv'][1])) die('Scriptr file $_SERVER[\'argv\'][1] not defined');
+function replace($path) {
+  foreach (['NGN_PATH', 'NGN_ENV_PATH'] as $v) $path = str_replace($v, constant($v), $path);
+  return $path;
+}
 
-$path = $_SERVER['argv'][1].'.php';
-foreach (['NGN_PATH', 'NGN_ENV_PATH'] as $v) $path = str_replace($v, constant($v), $path);
+if (!empty($_SERVER['argv'][2])) {
+  foreach (explode(';', $_SERVER['argv'][2]) as $libFolder) {
+    Lib::addFolder(replace($libFolder));
+  }
+}
+
+if (empty($_SERVER['argv'][1])) die('Script file $_SERVER[\'argv\'][1] not defined');
+
+if (strstr($_SERVER['argv'][1], '(')) { // eval
+  $cmd = trim($_SERVER['argv'][1]);
+  if ($cmd[strlen($cmd)-1] != ';') $cmd = "$cmd;";
+  eval($cmd);
+  return;
+}
+
+$path = replace($_SERVER['argv'][1].'.php');
 if ($path[0] == '/' or $path[0] == '~');
 else $path = __DIR__.'/run/'.$path;
 
-require_once $path;
+//die("\n******** $path\n");
 
+include $path;
