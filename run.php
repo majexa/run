@@ -10,6 +10,7 @@ define('PROJECT_KEY', 'run');
 define('LOGS_PATH', __DIR__.'/logs');
 define('RUN_PATH', __DIR__);
 
+Lib::addFolder(NGN_ENV_PATH.'/lib');
 Lib::addFolder(__DIR__.'/lib');
 
 function replace($path) {
