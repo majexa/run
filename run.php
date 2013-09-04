@@ -18,14 +18,6 @@ function replace($path) {
   return $path;
 }
 
-if (!empty($_SERVER['argv'][2])) {
-  foreach (explode(';', $_SERVER['argv'][2]) as $path) {
-    $path = replace($path);
-    if (Misc::hasSuffix('.php', $path)) require $path;
-    else Lib::addFolder($path);
-  }
-}
-
 if (empty($_SERVER['argv'][1])) die('Script file $_SERVER[\'argv\'][1] not defined');
 
 if (strstr($_SERVER['argv'][1], '(')) { // eval
@@ -38,5 +30,17 @@ if (strstr($_SERVER['argv'][1], '(')) { // eval
 $path = replace($_SERVER['argv'][1].'.php');
 if ($path[0] == '/' or $path[0] == '~');
 else $path = __DIR__.'/run/'.$path;
+
+if (!preg_match('/\$_SERVER\[[\'"]argv[\'"]\]/', file_get_contents($path))) {
+  // если в скрипте нет использования параметров командной строки,
+  // используем 2-й параметр в качестве необходимых инклюдов
+  if (!empty($_SERVER['argv'][2])) {
+    foreach (explode(';', $_SERVER['argv'][2]) as $path) {
+      $path = replace($path);
+      if (Misc::hasSuffix('.php', $path)) require $path;
+      else Lib::addFolder($path);
+    }
+  }
+}
 
 include $path;
