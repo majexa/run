@@ -1,4 +1,5 @@
 <?php
 
 // direct call
-(new ucfirst($_SERVER['argv'][2]))->{$_SERVER['argv'][3]}();
+$_SERVER['argv'][2] = ucfirst($_SERVER['argv'][2]);
+(new $_SERVER['argv'][2])->{$_SERVER['argv'][3]}();
