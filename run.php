@@ -6,6 +6,7 @@ define('NGN_ENV_PATH', dirname(__DIR__));
 
 require_once NGN_PATH.'/init/core.php';
 require_once NGN_PATH.'/init/cli.php';
+define('PROJECT_KEY', 'run');
 define('LOGS_PATH', __DIR__.'/logs');
 define('RUN_PATH', __DIR__);
 
@@ -17,8 +18,10 @@ function replace($path) {
 }
 
 if (!empty($_SERVER['argv'][2])) {
-  foreach (explode(';', $_SERVER['argv'][2]) as $libFolder) {
-    Lib::addFolder(replace($libFolder));
+  foreach (explode(';', $_SERVER['argv'][2]) as $path) {
+    $path = replace($path);
+    if (Misc::hasSuffix('.php', $path)) require $path;
+    else Lib::addFolder($path);
   }
 }
 
@@ -34,7 +37,5 @@ if (strstr($_SERVER['argv'][1], '(')) { // eval
 $path = replace($_SERVER['argv'][1].'.php');
 if ($path[0] == '/' or $path[0] == '~');
 else $path = __DIR__.'/run/'.$path;
-
-//die("\n******** $path\n");
 
 include $path;
