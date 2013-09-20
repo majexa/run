@@ -1,6 +1,11 @@
 #!/usr/bin/php
 <?php
 
+// примеры:
+// php run.php '(new StandardClass)->method()'
+// php run.php '(new SpecificClass)->method()' NGN_ENV_PATH/specific/lib
+// php run.php NGN_ENV_PATH/path/to/script.php NGN_ENV_PATH/specific/init.php
+
 define('NGN_PATH', dirname(__DIR__).'/ngn');
 define('NGN_ENV_PATH', dirname(__DIR__));
 
@@ -10,7 +15,6 @@ define('PROJECT_KEY', 'run');
 define('LOGS_PATH', __DIR__.'/logs');
 define('RUN_PATH', __DIR__);
 
-Lib::addFolder(NGN_ENV_PATH.'/lib');
 Lib::addFolder(__DIR__.'/lib');
 
 function replace($path) {
@@ -23,24 +27,22 @@ if (empty($_SERVER['argv'][1])) die('Script file $_SERVER[\'argv\'][1] not defin
 if (strstr($_SERVER['argv'][1], '(')) { // eval
   $cmd = trim($_SERVER['argv'][1]);
   if ($cmd[strlen($cmd)-1] != ';') $cmd = "$cmd;";
-  eval($cmd);
-  return;
+} else {
+  $path = replace($_SERVER['argv'][1].'.php');
+  if ($path[0] == '/' or $path[0] == '~');
+  else $path = __DIR__.'/run/'.$path;
 }
 
-$path = replace($_SERVER['argv'][1].'.php');
-if ($path[0] == '/' or $path[0] == '~');
-else $path = __DIR__.'/run/'.$path;
-
-if (!preg_match('/\$_SERVER\[[\'"]argv[\'"]\]/', file_get_contents($path))) {
+if (!isset($path) or !preg_match('/\$_SERVER\[[\'"]argv[\'"]\]/', file_get_contents($path))) {
   // если в скрипте нет использования параметров командной строки,
   // используем 2-й параметр в качестве необходимых инклюдов
   if (!empty($_SERVER['argv'][2])) {
-    foreach (explode(';', $_SERVER['argv'][2]) as $path) {
-      $path = replace($path);
-      if (Misc::hasSuffix('.php', $path)) require $path;
-      else Lib::addFolder($path);
+    foreach (explode(';', $_SERVER['argv'][2]) as $libPath) {
+      $libPath = replace($libPath);
+      if (Misc::hasSuffix('.php', $libPath)) require $libPath;
+      else Lib::addFolder($libPath);
     }
   }
 }
 
-include $path;
+isset($cmd) ? eval($cmd) : include $path;
