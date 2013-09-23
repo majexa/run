@@ -14,35 +14,6 @@ require_once NGN_PATH.'/init/cli.php';
 define('PROJECT_KEY', 'run');
 define('LOGS_PATH', __DIR__.'/logs');
 define('RUN_PATH', __DIR__);
-
 Lib::addFolder(__DIR__.'/lib');
 
-function replace($path) {
-  foreach (['NGN_PATH', 'NGN_ENV_PATH'] as $v) $path = str_replace($v, constant($v), $path);
-  return $path;
-}
-
-if (empty($_SERVER['argv'][1])) die('Script file $_SERVER[\'argv\'][1] not defined');
-
-if (strstr($_SERVER['argv'][1], '(')) { // eval
-  $cmd = trim($_SERVER['argv'][1]);
-  if ($cmd[strlen($cmd)-1] != ';') $cmd = "$cmd;";
-} else {
-  $path = replace($_SERVER['argv'][1].'.php');
-  if ($path[0] == '/' or $path[0] == '~');
-  else $path = __DIR__.'/run/'.$path;
-}
-
-if (!isset($path) or !preg_match('/\$_SERVER\[[\'"]argv[\'"]\]/', file_get_contents($path))) {
-  // если в скрипте нет использования параметров командной строки,
-  // используем 2-й параметр в качестве необходимых инклюдов
-  if (!empty($_SERVER['argv'][2])) {
-    foreach (explode(';', $_SERVER['argv'][2]) as $libPath) {
-      $libPath = replace($libPath);
-      if (Misc::hasSuffix('.php', $libPath)) require $libPath;
-      else Lib::addFolder($libPath);
-    }
-  }
-}
-
-isset($cmd) ? eval($cmd) : include $path;
+(new ClRun)->run(array_slice($_SERVER['argv'], 1));
