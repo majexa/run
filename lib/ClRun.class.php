@@ -15,7 +15,7 @@ class ClRun {
     } else {
       $path = self::replace($args[0].'.php');
       if ($path[0] == '/' or $path[0] == '~');
-      else $path = __DIR__.'/run/'.$path;
+      else $path = RUN_PATH.'/run/'.$path;
     }
     if (!empty($args[1])) {
       // указан 2-й параметр
