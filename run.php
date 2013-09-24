@@ -14,6 +14,7 @@ require_once NGN_PATH.'/init/cli.php';
 define('PROJECT_KEY', 'run');
 define('LOGS_PATH', __DIR__.'/logs');
 define('RUN_PATH', __DIR__);
+require_once __DIR__.'/lib/ClRun.class.php';
 Lib::addFolder(__DIR__.'/lib');
 
 (new ClRun)->run(array_slice($_SERVER['argv'], 1));

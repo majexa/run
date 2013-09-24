@@ -21,8 +21,8 @@ class ClRun {
       // указан 2-й параметр
       if (!isset($path) or !preg_match('/\$_SERVER\[[\'"]argv[\'"]\]/', file_get_contents($path))) {
         // если в скрипте нет использования параметров командной строки
-        if (strstr($args[1], ';')) {
-          // если есть ";", значит 2-й параметр - инклюды
+        if (strstr($args[1], '/')) {
+          // если есть "/", значит 2-й параметр - инклюды
           foreach (explode(';', $args[1]) as $libPath) {
             $libPath = self::replace($libPath);
             if (Misc::hasSuffix('.php', $libPath)) require $libPath;
