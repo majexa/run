@@ -3,7 +3,8 @@
 class TestAllErrors extends NgnTestCase {
 
   function test() {
-    $this->assertFalse(!!(new AllErrors)->get());
+    $r = (new AllErrors)->get();
+    $this->assertFalse(!!$r, implode(', ', Arr::get($r, 'file')));
   }
 
 }
