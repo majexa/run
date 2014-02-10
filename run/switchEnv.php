@@ -30,11 +30,11 @@ if (!empty($_SERVER['argv'][2])) {
     output("Server is already $type");
     return;
   }
-  Config::updateSubVar(NGN_ENV_PATH.'/config/server.php', 'sType', $type);
+  FileVar::updateSubVar(NGN_ENV_PATH.'/config/server.php', 'sType', $type);
   $projects = require NGN_ENV_PATH.'/config/projects.php';
   $method = (strstr($type, 'test') ? 'test' : 'prod').'Domain';
   foreach ($projects as &$v) $v['domain'] = PmCore::$method($v['domain'], $type);
-  Config::updateVar(NGN_ENV_PATH.'/config/projects.php', $projects);
+  FileVar::updateVar(NGN_ENV_PATH.'/config/projects.php', $projects);
   system('php '.NGN_ENV_PATH.'/pm/pm.php localProjects updateConfig');
   system('php '.NGN_ENV_PATH.'/pm/pm.php localProjects updateIndex');
   system('php '.NGN_ENV_PATH.'/pm/pm.php localServer updateHosts');

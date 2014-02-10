@@ -29,11 +29,16 @@ class AllErrors extends Errors {
     foreach ($this->getFiles() as $v) {
       if (!($items = LogReader::_get($v['file']))) continue;
       foreach ($items as &$item) $item['name'] = $v['name'];
-      $r = Arr::append($r, $items);
+      $r = array_merge($r, $items);
     }
     return $r;
   }
 
+  /**
+   * Очищает все логи с ошибками на сервере
+   * @manual logs
+   * @cmd run
+   */
   function clear() {
     foreach ($this->getFiles() as $v) file_put_contents($v['file'], '');
   }

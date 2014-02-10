@@ -35,7 +35,8 @@ class ClRun {
         }
       }
     }
-    isset($cmd) ? eval($cmd) : include $path;
+    if (($path = realpath($path))) isset($cmd) ? eval($cmd) : include $path;
+    else throw Exception("path '$path' not found");
     Cli::storeCommand(RUN_PATH.'/logs');
   }
 
