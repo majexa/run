@@ -1,14 +1,14 @@
 <?php
 
 $curFile = basename(__FILE__).': ';
-
-$domain = $_SERVER['argv'][1];
+$domain = $_SERVER['argv'][2];
 if (empty($domain)) die($curFile.'Project folder $domain not defined');
 
 define('NGN_ENV_PATH', dirname(__DIR__));
 define('NGN_PATH', NGN_ENV_PATH.'/ngn');
 define('WEBROOT_PATH', NGN_ENV_PATH.'/projects/'.$domain);
 define('RUN_PATH', __DIR__);
+
 
 if (!file_exists(WEBROOT_PATH)) die($curFile."Webroot folder '".WEBROOT_PATH."' does not exists.");
 

@@ -1,1 +1,1 @@
-php ~/ngn-env/run/run.php "new CliTestRunner('$*')"
+php ~/ngn-env/run/ngn-test.php $*

@@ -8,6 +8,10 @@ class ClRun {
   }
 
   function run(array $args) {
+    if (empty($args[0])) {
+      $this->help();
+      return;
+    }
     Arr::checkEmpty($args, 0);
     if (!empty($args[1])) {
       $this->processIncludes($args[1]);
@@ -16,6 +20,22 @@ class ClRun {
       require RUN_PATH.'/defaultInit.php';
     }
     $this->processPath($args[0]);
+  }
+
+  protected function runner() {
+    return O::get('CliColors')->getColoredString('run', 'brown');
+  }
+
+  protected function caption($text) {
+    return O::get('CliColors')->getColoredString('-- '.$text, 'cyan');
+  }
+
+  protected function help() {
+    print O::get('CliColors')->getColoredString('Supported commands:', 'yellow')."\n";
+    print $this->runner().' cmd/path'."\n";
+    print $this->runner().' site projectName cmd/path'."\n";
+    print O::get('CliColors')->getColoredString('cmd/path variants:', 'yellow')."\n";
+    print "* (new Class('a'))->run()\n* /path/to/file\n* NGN_ENV_PATH/path/to/file\n* NGN_PATH/path/to/file\n";
   }
 
   protected function processIncludes($includes) {
@@ -42,14 +62,13 @@ class ClRun {
     if (strstr($initPath, '(')) { // eval
       $cmd = trim($initPath);
       if ($cmd[strlen($cmd) - 1] != ';') $cmd = "$cmd;";
+      eval($cmd);
     }
     else {
       $path = self::replace($initPath.'.php');
-      //if ($path[0] == '/' or $path[0] == '~');
-      //else $path = RUN_PATH.'/run/'.$path;
+      if (!($path = realpath($path))) throw new Exception("path '$initPath' not found");
+      include $path;
     }
-    if (($_path = realpath($path))) isset($cmd) ? eval($cmd) : include $_path;
-    else throw new Exception("path '$path' not found");
     Cli::storeCommand(RUN_PATH.'/logs');
   }
 
