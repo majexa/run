@@ -2,7 +2,7 @@
 
 class ClRun {
 
-  function replace($path) {
+  static function replace($path) {
     foreach (['NGN_PATH', 'NGN_ENV_PATH'] as $v) $path = str_replace($v, constant($v), $path);
     return $path;
   }

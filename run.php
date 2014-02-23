@@ -3,7 +3,6 @@
 
 if (isset($_SERVER['argv'][1]) and $_SERVER['argv'][1] == 'site') {
   require_once __DIR__.'/siteStandAloneInit.php';
-  //die2(array_slice($_SERVER['argv'], 3));
   (new ClRun)->run(array_slice($_SERVER['argv'], 3));
 }
 else {
