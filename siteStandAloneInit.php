@@ -10,7 +10,7 @@ define('WEBROOT_PATH', NGN_ENV_PATH.'/projects/'.$domain);
 define('RUN_PATH', __DIR__);
 
 
-if (!file_exists(WEBROOT_PATH)) die($curFile."Webroot folder '".WEBROOT_PATH."' does not exists.");
+if (!file_exists(WEBROOT_PATH)) die($curFile."Webroot folder '".WEBROOT_PATH."' does not exists.\n");
 
 define('SITE_PATH', WEBROOT_PATH.'/site');
 
