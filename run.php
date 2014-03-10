@@ -12,6 +12,7 @@ else {
   require_once NGN_PATH.'/init/cli.php';
   define('PROJECT_KEY', 'run');
   define('LOGS_PATH', __DIR__.'/logs');
+  define('DATA_PATH', __DIR__.'/data');
   define('RUN_PATH', __DIR__);
   require_once __DIR__.'/lib/ClRun.class.php';
   Lib::addFolder(__DIR__.'/lib');

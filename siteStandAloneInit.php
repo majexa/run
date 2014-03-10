@@ -29,4 +29,4 @@ require_once NGN_PATH.'/init/site.php';
 
 require_once __DIR__.'/lib/ClRun.class.php';
 if (file_exists(SITE_PATH.'/init.php')) require_once SITE_PATH.'/init.php';
-NgnCache::clean();
+FileCache::clean();

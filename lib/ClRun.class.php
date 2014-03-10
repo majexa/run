@@ -49,6 +49,7 @@ class ClRun {
           if (Misc::hasSuffix('.php', $libPath)) require $libPath;
           else Lib::addFolder($libPath);
         }
+        Lib::cache($includes);
       }
       elseif (strstr($includes, '+')) {
         // если есть "+", значит 2-й параметр - опции
@@ -56,6 +57,7 @@ class ClRun {
         R::set('options', NgnCl::strParamsToArray($includes));
       }
     }
+    //die2($includes);
   }
 
   protected function processPath($initPath) {
