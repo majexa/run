@@ -7,7 +7,7 @@ class ClRun {
     return $path;
   }
 
-  function run(array $args) {
+  function run(array $args, array $initArgs) {
     if (empty($args[0])) {
       $this->help();
       return;
@@ -19,7 +19,7 @@ class ClRun {
     else {
       require RUN_PATH.'/defaultInit.php';
     }
-    $this->processPath($args[0]);
+    $this->processPath($args, $initArgs);
   }
 
   protected function runner() {
@@ -32,8 +32,12 @@ class ClRun {
 
   protected function help() {
     print O::get('CliColors')->getColoredString('Supported commands:', 'yellow')."\n";
+    $methods = array_filter((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC), function (ReflectionMethod $m) {
+      return $m->getName() != 'run' and !$m->isStatic();
+    });
+    foreach ($methods as $method) print $this->runner().' '.$method->getName().(O::get('CliColors')->getColoredString(' -- Clears run envirnment cache', 'cyan'))."\n";
     print $this->runner().' cmd/path'."\n";
-    print $this->runner().' site projectName cmd/path'."\n";
+    print $this->runner().' site projectName cmd/path/ngn'.(O::get('CliColors')->getColoredString(' -- cmd: "new Class()" / path: NGN_ENV_PATH/path/to/libOrFile / ngn: just type it', 'cyan'))."\n";
     print O::get('CliColors')->getColoredString('cmd/path variants:', 'yellow')."\n";
     print "* (new Class('a'))->run()\n* /path/to/file\n* NGN_ENV_PATH/path/to/file\n* NGN_PATH/path/to/file\n";
   }
@@ -57,14 +61,26 @@ class ClRun {
         R::set('options', NgnCl::strParamsToArray($includes));
       }
     }
-    //die2($includes);
   }
 
-  protected function processPath($initPath) {
+  function cc() {
+    FileCache::clean();
+    print "done.\n";
+  }
+
+  protected function processPath(array $args, array $initArgs) {
+    $initPath = $args[0];
+    if (method_exists($this, $initPath)) {
+      $this->$initPath();
+      return;
+    }
     if (strstr($initPath, '(')) { // eval
       $cmd = trim($initPath);
       if ($cmd[strlen($cmd) - 1] != ';') $cmd = "$cmd;";
       eval($cmd);
+    }
+    elseif ($initPath == 'ngn') {
+      new NgnCli($args, ['runner' => 'run '.implode(' ', array_slice($initArgs, 1, 3))]);
     }
     else {
       $path = self::replace($initPath.'.php');
