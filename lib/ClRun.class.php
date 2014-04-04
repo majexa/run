@@ -3,6 +3,7 @@
 class ClRun {
 
   static function replace($path) {
+    if ($path[0] != '/') $path = NGN_ENV_PATH.'/'.$path;
     foreach (['NGN_PATH', 'NGN_ENV_PATH'] as $v) $path = str_replace($v, constant($v), $path);
     return $path;
   }
@@ -13,12 +14,20 @@ class ClRun {
       return;
     }
     Arr::checkEmpty($args, 0);
-    if (!empty($args[1])) {
-      $this->processIncludes($args[1]);
+    $includes = '';
+    if (strstr($args[0], '/')) {
+      $probableLibFolder = dirname($args[0]);
+      if (file_exists(self::replace($probableLibFolder))) $includes .= ($includes ? ';' : '').$probableLibFolder;
     }
+    if (!empty($args[1])) {
+      if (isset($probableLibFolder) and $probableLibFolder == $args[1]) throw new Exception('no need to require twice');
+      $includes .= ($includes ? ';' : '').$args[1];
+    }
+    if ($includes) $this->processIncludes($includes);
     else {
       require RUN_PATH.'/defaultInit.php';
     }
+    require_once __DIR__.'/runConfig.php';
     $this->processPath($args, $initArgs);
   }
 
@@ -43,23 +52,20 @@ class ClRun {
   }
 
   protected function processIncludes($includes) {
-    // указан 2-й параметр
-    if (!isset($path) or !preg_match('/\$_SERVER\[[\'"]argv[\'"]\]/', file_get_contents($path))) {
-      // если в скрипте нет использования параметров командной строки
-      if (strstr($includes, '/')) {
-        // если есть "/", значит 2-й параметр - инклюды
-        foreach (explode(';', $includes) as $libPath) {
-          $libPath = self::replace($libPath);
-          if (Misc::hasSuffix('.php', $libPath)) require $libPath;
-          else Lib::addFolder($libPath);
-        }
-        Lib::cache($includes);
+    // если в скрипте нет использования параметров командной строки
+    if (strstr($includes, '=')) {
+      // если есть "=", значит 2-й параметр - опции
+      require_once NGN_PATH.'/lib/more/common/NgnCl.class.php';
+      R::set('options', NgnCl::strParamsToArray($includes));
+    }
+    else {
+      // если есть "/", значит 2-й параметр - инклюды
+      foreach (explode(';', $includes) as $libPath) {
+        $libPath = self::replace($libPath);
+        if (Misc::hasSuffix('.php', $libPath)) require $libPath;
+        else Lib::addFolder($libPath);
       }
-      elseif (strstr($includes, '+')) {
-        // если есть "+", значит 2-й параметр - опции
-        require_once NGN_PATH.'/lib/more/common/NgnCl.class.php';
-        R::set('options', NgnCl::strParamsToArray($includes));
-      }
+      Lib::cache($includes);
     }
   }
 
