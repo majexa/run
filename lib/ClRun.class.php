@@ -27,7 +27,7 @@ class ClRun {
     else {
       require RUN_PATH.'/defaultInit.php';
     }
-    require_once __DIR__.'/runConfig.php';
+    if (file_exists(__DIR__.'/runConfig.php')) require_once __DIR__.'/runConfig.php';
     $this->processPath($args, $initArgs);
   }
 
