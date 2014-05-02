@@ -18,17 +18,31 @@ class ClRun {
     if (strstr($args[0], '/')) {
       $probableLibFolder = dirname($args[0]);
       if (file_exists(self::replace($probableLibFolder))) $includes .= ($includes ? ';' : '').$probableLibFolder;
+      $probableInitPath = dirname($args[0]).'/init.php';
+      if (file_exists(self::replace($probableInitPath))) $includes .= ($includes ? ';' : '').$probableInitPath;
     }
     if (!empty($args[1])) {
-      if (isset($probableLibFolder) and $probableLibFolder == $args[1]) throw new Exception('no need to require twice');
-      $includes .= ($includes ? ';' : '').$args[1];
+      if ($this->isOptionsArg($args[1])) {
+        require_once NGN_PATH.'/more/lib/common/NgnCl.class.php';
+        R::set('options', NgnCl::strParamsToArray($args[1]));
+      } else {
+        if (isset($probableLibFolder) and $probableLibFolder == $args[1]) throw new Exception('no need to require twice');
+        $includes .= ($includes ? ';' : '').$args[1];
+      }
     }
-    if ($includes) $this->processIncludes($includes);
-    else {
+    if ($includes) {
+      // если есть "/", значит 2-й параметр - инклюды
+      foreach (explode(';', $includes) as $libPath) {
+        $libPath = self::replace($libPath);
+        if (Misc::hasSuffix('.php', $libPath)) require $libPath;
+        else Lib::addFolder($libPath);
+      }
+      Lib::cache($includes);
+    } else {
       require RUN_PATH.'/defaultInit.php';
     }
     if (file_exists(__DIR__.'/runConfig.php')) require_once __DIR__.'/runConfig.php';
-    $this->processPath($args, $initArgs);
+    $this->processPath($args[0]);
   }
 
   protected function runner() {
@@ -51,22 +65,8 @@ class ClRun {
     print "* (new Class('a'))->run()\n* /path/to/file\n* NGN_ENV_PATH/path/to/file\n* NGN_PATH/path/to/file\n";
   }
 
-  protected function processIncludes($includes) {
-    // если в скрипте нет использования параметров командной строки
-    if (strstr($includes, '=')) {
-      // если есть "=", значит 2-й параметр - опции
-      require_once NGN_PATH.'/lib/more/common/NgnCl.class.php';
-      R::set('options', NgnCl::strParamsToArray($includes));
-    }
-    else {
-      // если есть "/", значит 2-й параметр - инклюды
-      foreach (explode(';', $includes) as $libPath) {
-        $libPath = self::replace($libPath);
-        if (Misc::hasSuffix('.php', $libPath)) require $libPath;
-        else Lib::addFolder($libPath);
-      }
-      Lib::cache($includes);
-    }
+  protected function isOptionsArg($arg) {
+    return (bool)strstr($arg, '=');
   }
 
   function cc() {
@@ -74,23 +74,23 @@ class ClRun {
     print "done.\n";
   }
 
-  protected function processPath(array $args, array $initArgs) {
-    $initPath = $args[0];
-    if (method_exists($this, $initPath)) {
-      $this->$initPath();
+  protected function processPath($path) {
+    if (method_exists($this, $path)) {
+      $this->$path();
       return;
     }
-    if (strstr($initPath, '(')) { // eval
-      $cmd = trim($initPath);
+    if (strstr($path, '(')) { // eval
+      $cmd = trim($path);
       if ($cmd[strlen($cmd) - 1] != ';') $cmd = "$cmd;";
       eval($cmd);
     }
-    elseif ($initPath == 'ngn') {
-      new NgnCli($args, ['runner' => 'run '.implode(' ', array_slice($initArgs, 1, 3))]);
+    elseif ($path == 'ngn') {
+      throw new Exception('depricated');
+      // new NgnCli($args, ['runner' => 'run '.implode(' ', array_slice($initArgs, 1, 3))]);
     }
     else {
-      $path = self::replace($initPath.'.php');
-      if (!($path = realpath($path))) throw new Exception("path '$initPath' not found");
+      $path = self::replace($path.'.php');
+      if (!($path = realpath($path))) throw new Exception("path '$path' not found");
       include $path;
     }
     Cli::storeCommand(RUN_PATH.'/logs');
