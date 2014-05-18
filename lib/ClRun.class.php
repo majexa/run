@@ -90,8 +90,8 @@ class ClRun {
     }
     else {
       $path = self::replace($path.'.php');
-      if (!($path = realpath($path))) throw new Exception("path '$path' not found");
-      include $path;
+      if (!($_path = realpath($path))) throw new Exception("path '$path' not found");
+      include $_path;
     }
     Cli::storeCommand(RUN_PATH.'/logs');
   }
