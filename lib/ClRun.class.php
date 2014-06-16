@@ -70,7 +70,7 @@ class ClRun {
   }
 
   function cc() {
-    FileCache::clean();
+    foreach (glob(DATA_PATH.'/cache/*---*') as $file) unlink($file);
     print "done.\n";
   }
 
