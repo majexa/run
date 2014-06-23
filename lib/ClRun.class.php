@@ -34,7 +34,7 @@ class ClRun {
       // если есть "/", значит 2-й параметр - инклюды
       foreach (explode(';', $includes) as $libPath) {
         $libPath = self::replace($libPath);
-        if (Misc::hasSuffix('.php', $libPath)) require $libPath;
+        if (Misc::hasSuffix('.php', $libPath)) require_once $libPath;
         else Lib::addFolder($libPath);
       }
       Lib::cache($includes);
