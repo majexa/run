@@ -8,7 +8,7 @@ class ClRun {
     return $path;
   }
 
-  function run(array $args, array $initArgs) {
+  function run(array $args) {
     if (empty($args[0])) {
       $this->help();
       return;
