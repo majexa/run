@@ -14,30 +14,22 @@ class ClRun {
       return;
     }
     Arr::checkEmpty($args, 0);
-    $includes = '';
-    if (strstr($args[0], '/')) {
-      $probableLibFolder = dirname($args[0]);
-      if (file_exists(self::replace($probableLibFolder))) $includes .= ($includes ? ';' : '').$probableLibFolder;
-      $probableInitPath = dirname($args[0]).'/init.php';
-      if (file_exists(self::replace($probableInitPath))) $includes .= ($includes ? ';' : '').$probableInitPath;
-    }
+    $probableInitPath = dirname($args[0]).'/init.php';
+    $probableLibFolder = dirname($args[0]);
+    $include = false;
+    if (file_exists(self::replace($probableInitPath))) $include = $probableInitPath;
+    elseif (file_exists(self::replace($probableLibFolder))) $include = $probableLibFolder;
     if (!empty($args[1])) {
       if ($this->isOptionsArg($args[1])) {
         require_once NGN_PATH.'/more/lib/common/NgnCl.class.php';
         R::set('options', NgnCl::strParamsToArray($args[1]));
-      } else {
-        if (isset($probableLibFolder) and $probableLibFolder == $args[1]) throw new Exception('no need to require twice');
-        $includes .= ($includes ? ';' : '').$args[1];
       }
     }
-    if ($includes) {
-      // если есть "/", значит 2-й параметр - инклюды
-      foreach (explode(';', $includes) as $libPath) {
-        $libPath = self::replace($libPath);
-        if (Misc::hasSuffix('.php', $libPath)) require_once $libPath;
-        else Lib::addFolder($libPath);
-      }
-      Lib::cache($includes);
+    if ($include) {
+      $include = self::replace($include);
+      if (Misc::hasSuffix('.php', $include)) require_once $include;
+      else Lib::addFolder($include);
+      Lib::cache($include);
     } else {
       require RUN_PATH.'/defaultInit.php';
     }
