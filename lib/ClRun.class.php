@@ -14,15 +14,27 @@ class ClRun {
       return;
     }
     Arr::checkEmpty($args, 0);
-    $probableInitPath = dirname($args[0]).'/init.php';
-    $probableLibFolder = dirname($args[0]);
     $include = false;
-    if (file_exists(self::replace($probableInitPath))) $include = $probableInitPath;
-    elseif (file_exists(self::replace($probableLibFolder))) $include = $probableLibFolder;
+    if (!$this->isCode($args[0]) and file_exists($args[0])) {
+      // Если первый параметр - путь, смотрим вероятные файлы/папки для инициализации относительно него
+      $probableInitPath = dirname($args[0]).'/init.php';
+      $probableLibFolder = dirname($args[0]);
+      if (file_exists(self::replace($probableInitPath))) {
+        output("Probable init path exists: $probableInitPath");
+        $include = $probableInitPath;
+      }
+      elseif (file_exists(self::replace($probableLibFolder))) {
+        output("Probable lib folder exists: $probableLibFolder");
+        $include = $probableLibFolder;
+      }
+    }
     if (!empty($args[1])) {
       if ($this->isOptionsArg($args[1])) {
         require_once NGN_PATH.'/more/lib/common/NgnCl.class.php';
         R::set('options', NgnCl::strParamsToArray($args[1]));
+      }
+      else {
+        $include = $args[1];
       }
     }
     if ($include) {
@@ -30,7 +42,8 @@ class ClRun {
       if (Misc::hasSuffix('.php', $include)) require_once $include;
       else Lib::addFolder($include);
       Lib::cache($include);
-    } else {
+    }
+    else {
       require RUN_PATH.'/defaultInit.php';
     }
     if (file_exists(__DIR__.'/runConfig.php')) require_once __DIR__.'/runConfig.php';
@@ -66,12 +79,16 @@ class ClRun {
     print "done.\n";
   }
 
+  protected function isCode($param) {
+    return strstr($param, '(');
+  }
+
   protected function processPath($path) {
     if (method_exists($this, $path)) {
       $this->$path();
       return;
     }
-    if (strstr($path, '(')) { // eval
+    if ($this->isCode($path)) { // eval
       $cmd = trim($path);
       if ($cmd[strlen($cmd) - 1] != ';') $cmd = "$cmd;";
       eval($cmd);
