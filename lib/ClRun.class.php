@@ -74,7 +74,6 @@ class ClRun {
     if (strstr($path, '(')) { // eval
       $cmd = trim($path);
       if ($cmd[strlen($cmd) - 1] != ';') $cmd = "$cmd;";
-      output2($cmd);
       eval($cmd);
     }
     elseif ($path == 'ngn') {
