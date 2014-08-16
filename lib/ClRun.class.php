@@ -38,6 +38,7 @@ class ClRun {
       }
     }
     if ($include) {
+      //output("include $include");
       $include = self::replace($include);
       if (Misc::hasSuffix('.php', $include)) require_once $include;
       else Lib::addFolder($include);
@@ -100,6 +101,7 @@ class ClRun {
     else {
       $path = self::replace($path.'.php');
       if (!($_path = realpath($path))) throw new Exception("path '$path' not found");
+      //output("run $_path");
       include $_path;
     }
     Cli::storeCommand(RUN_PATH.'/logs');
