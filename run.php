@@ -16,6 +16,7 @@ else {
   require_once NGN_PATH.'/init/more.php';
   require_once NGN_PATH.'/init/cli.php';
   require_once __DIR__.'/lib/ClRun.class.php';
+  LogWriter::str('aaaaa', 1);
   Lib::addFolder(__DIR__.'/lib');
   (new ClRun)->run(array_slice($_SERVER['argv'], 1), $_SERVER['argv']);
 }
