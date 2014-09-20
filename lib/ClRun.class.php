@@ -31,14 +31,13 @@ class ClRun {
     if (!empty($args[1])) {
       if ($this->isOptionsArg($args[1])) {
         require_once NGN_PATH.'/more/lib/common/NgnCl.class.php';
-        R::set('options', NgnCl::strParamsToArray($args[1]));
+        R::set('options', Cli::strParamsToArray($args[1]));
       }
       else {
         $include = $args[1];
       }
     }
     if ($include) {
-      //output("include $include");
       $include = self::replace($include);
       if (Misc::hasSuffix('.php', $include)) require_once $include;
       else Lib::addFolder($include);
