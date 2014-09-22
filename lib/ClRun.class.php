@@ -30,7 +30,7 @@ class ClRun {
     }
     if (!empty($args[1])) {
       if ($this->isOptionsArg($args[1])) {
-        require_once NGN_PATH.'/more/lib/common/NgnCl.class.php';
+        require_once CORE_PATH.'/lib/cli/Cli.class.php';
         R::set('options', Cli::strParamsToArray($args[1]));
       }
       else {
