@@ -1,7 +1,7 @@
 <?php
 
 $curFile = basename(__FILE__).': ';
-$projectName = $_SERVER['argv'][2];
+$projectName = defined('PROJECT') ? PROJECT : $_SERVER['argv'][2];
 if (empty($projectName)) die($curFile.'Project folder $domain not defined');
 
 define('NGN_ENV_PATH', dirname(__DIR__));
