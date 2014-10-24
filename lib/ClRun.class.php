@@ -106,14 +106,9 @@ class ClRun {
       if ($code[strlen($code) - 1] != ';') $code = "$code;";
       eval($code);
     }
-    elseif ($path == 'ngn') {
-      throw new Exception('depricated');
-      // new NgnCli($args, ['runner' => 'run '.implode(' ', array_slice($initArgs, 1, 3))]);
-    }
     else {
       $path = self::replace($path.'.php');
       if (!($_path = realpath($path))) throw new Exception("path '$path' not found");
-      //output("run $_path");
       include $_path;
     }
     Cli::storeCommand(RUN_PATH.'/logs');
