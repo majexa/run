@@ -86,15 +86,25 @@ class ClRun {
     return strstr($param, '(');
   }
 
+  protected function parseClass($s) {
+    $classRe = '[A-Z][a-zA-Z0-9_]*';
+    if (preg_match("/new ($classRe)/", $s, $m)) return $m[1];
+    if (preg_match("/($classRe)::/", $s, $m)) return $m[1];
+    return false;
+  }
+
   protected function processPath($path) {
     if (method_exists($this, $path)) {
       $this->$path();
       return;
     }
     if ($this->isCode($path)) { // eval
-      $cmd = trim($path);
-      if ($cmd[strlen($cmd) - 1] != ';') $cmd = "$cmd;";
-      eval($cmd);
+      $code = trim($path);
+      if (($class = $this->parseClass($code))) {
+        if (!class_exists($class)) throw new Exception('Class "'.$class.'" not exists in code: '.$code);
+      }
+      if ($code[strlen($code) - 1] != ';') $code = "$code;";
+      eval($code);
     }
     elseif ($path == 'ngn') {
       throw new Exception('depricated');
