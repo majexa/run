@@ -60,14 +60,14 @@ class ClRun {
 
   protected function help() {
     print O::get('CliColors')->getColoredString('Универсальная точка запуска:', 'green')."\n";
-    if (!CliHelp::$disableDescription) print O::get('CliColors')->getColoredString('Supported commands:', 'yellow')."\n";
+    if (!CliAccess::$disableDescription) print O::get('CliColors')->getColoredString('Supported commands:', 'yellow')."\n";
     $methods = array_filter((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC), function (ReflectionMethod $m) {
       return $m->getName() != 'run' and !$m->isStatic();
     });
     foreach ($methods as $method) print $this->runner().' '.$method->getName().(O::get('CliColors')->getColoredString(' -- Clears run envirnment cache', 'cyan'))."\n";
     print $this->runner().' cmd/path'."\n";
     print $this->runner().' site projectName cmd/path/ngn'.(O::get('CliColors')->getColoredString(' -- cmd: "new Class()" / path: NGN_ENV_PATH/path/to/libOrFile / ngn: just type it', 'cyan'))."\n";
-    if (!CliHelp::$disableDescription) {
+    if (!CliAccess::$disableDescription) {
       print O::get('CliColors')->getColoredString('cmd/path variants:', 'yellow')."\n";
       print "* (new Class('a'))->run()\n* /path/to/file\n* NGN_ENV_PATH/path/to/file\n* NGN_PATH/path/to/file\n";
     }
