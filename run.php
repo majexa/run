@@ -3,7 +3,7 @@
 
 if (isset($_SERVER['argv'][1]) and $_SERVER['argv'][1] == 'site') {
   require_once __DIR__.'/siteStandAloneInit.php';
-  (new ClRun)->run(array_slice($_SERVER['argv'], 3), $_SERVER['argv']);
+  (new ClRun)->run(array_slice($_SERVER['argv'], 3));
 }
 else {
   define('NGN_PATH', dirname(__DIR__).'/ngn');
@@ -17,5 +17,5 @@ else {
   require_once NGN_PATH.'/init/cli.php';
   require_once __DIR__.'/lib/ClRun.class.php';
   Lib::addFolder(__DIR__.'/lib');
-  (new ClRun)->run(array_slice($_SERVER['argv'], 1), $_SERVER['argv']);
+  (new ClRun)->run(array_slice($_SERVER['argv'], 1));
 }
