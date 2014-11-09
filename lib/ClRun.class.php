@@ -40,13 +40,14 @@ class ClRun {
     if ($include) {
       $include = self::replace($include);
       $probableInitPath = $include.'/init.php';
+      if (!Misc::hasSuffix('.php', $include)) Lib::addFolder($include);
+      Lib::enableCache($include);
+      if (Misc::hasSuffix('.php', $include)) require_once $include;
       if (file_exists($probableInitPath)) require $probableInitPath;
-      elseif (Misc::hasSuffix('.php', $include)) require_once $include;
-      else Lib::addFolder($include);
-      Lib::cache($include);
     }
     else {
       require RUN_PATH.'/defaultInit.php';
+      Lib::enableCache($include);
     }
     if (file_exists(__DIR__.'/runConfig.php')) require_once __DIR__.'/runConfig.php';
     $this->processPath($args[0]);
