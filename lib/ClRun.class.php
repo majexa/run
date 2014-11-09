@@ -62,6 +62,7 @@ class ClRun {
   }
 
   protected function help() {
+    Lib::enableCache();
     print O::get('CliColors')->getColoredString('Универсальная точка запуска:', 'green')."\n";
     if (!CliAccess::$disableDescription) print O::get('CliColors')->getColoredString('Supported commands:', 'yellow')."\n";
     $methods = array_filter((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC), function (ReflectionMethod $m) {
