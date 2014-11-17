@@ -69,11 +69,16 @@ class ClRun {
       return $m->getName() != 'run' and !$m->isStatic();
     });
     foreach ($methods as $method) print $this->runner().' '.$method->getName().(O::get('CliColors')->getColoredString(' -- Clears run envirnment cache', 'cyan'))."\n";
-    print $this->runner().' cmd/path'."\n";
+    print $this->runner().' cmd/path/code {ngnEnvLib}'."\n";
     print $this->runner().' site projectName cmd/path/ngn'.(O::get('CliColors')->getColoredString(' -- cmd: "new Class()" / path: NGN_ENV_PATH/path/to/libOrFile / ngn: just type it', 'cyan'))."\n";
     if (!CliAccess::$disableDescription) {
       print O::get('CliColors')->getColoredString('cmd/path variants:', 'yellow')."\n";
-      print "* (new Class('a'))->run()\n* /path/to/file\n* NGN_ENV_PATH/path/to/file\n* NGN_PATH/path/to/file\n";
+      print "* (new Class('a'))->run()\n".
+      "* /path/to/file\n".
+      "* ci/1 ci\n".
+      "* '(new CiClass)->method()' ci\n".
+      "* NGN_ENV_PATH/path/to/file\n".
+      "* NGN_PATH/path/to/file\n";
     }
   }
 
