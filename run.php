@@ -12,7 +12,7 @@ else {
   define('LOGS_PATH', __DIR__.'/logs');
   define('DATA_PATH', __DIR__.'/data');
   define('RUN_PATH', __DIR__);
-  define('SITE_PATH', RUN_PATH);
+  define('PROJECT_PATH', RUN_PATH);
   require_once NGN_PATH.'/init/more.php';
   require_once NGN_PATH.'/init/cli.php';
   require_once __DIR__.'/lib/ClRun.class.php';
