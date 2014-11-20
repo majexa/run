@@ -24,14 +24,18 @@ class AllErrors extends Errors {
     });
   }
 
+  public $limit = 100;
+
   function get() {
-    $r = [];
+    $n = 0;
     foreach ($this->getFiles() as $v) {
-      if (!($items = LogReader::_get($v['file']))) continue;
-      foreach ($items as &$item) $item['name'] = $v['name'];
-      $r = array_merge($r, $items);
+      foreach (LogReader::_get($v['file']) as $item) {
+        $item['name'] = $v['name'];
+        yield $item;
+        $n++;
+        if ($n == $this->limit) break 2;
+      }
     }
-    return $r;
   }
 
   /**
