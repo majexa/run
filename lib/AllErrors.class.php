@@ -38,6 +38,14 @@ class AllErrors extends Errors {
     }
   }
 
+  function output() {
+    foreach ($this->get() as $v) {
+      print O::get('CliColors')->getColoredString(str_pad($v['name'], 13), 'green').date('d.m.Y H:i:s', $v['time'])."     ".O::get('CliColors')->getColoredString($v['body'], 'red')."\n";
+      if (isset($v['url'])) print O::get('CliColors')->getColoredString('URL: '.$v['url'], 'cyan')."\n";
+      print O::get('CliColors')->getColoredString($v['trace'], 'brown')."\n";
+    }
+  }
+
   /**
    * Очищает все логи с ошибками на сервере
    * @manual logs
