@@ -28,14 +28,18 @@ class AllErrors extends Errors {
 
   function get() {
     $n = 0;
+    $r = [];
     foreach ($this->getFiles() as $v) {
       foreach (LogReader::_get($v['file']) as $item) {
         $item['name'] = $v['name'];
-        yield $item;
+        $r[] = $item;
+        // generators realization
+        //yield $item;
         $n++;
         if ($n == $this->limit) break 2;
       }
     }
+    return Arr::sortByOrderKey($r, 'time', SORT_DESC);
   }
 
   function output() {
