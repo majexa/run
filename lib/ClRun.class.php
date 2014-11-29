@@ -14,6 +14,7 @@ class ClRun {
       return;
     }
     Arr::checkEmpty($args, 0);
+    Err::setEntryCmd('run '.implode($args));
     $include = false;
     if (!$this->isCode($args[0]) and file_exists($args[0])) {
       // Если первый параметр - путь, смотрим вероятные файлы/папки для инициализации относительно него
