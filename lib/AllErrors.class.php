@@ -43,7 +43,6 @@ class AllErrors extends Errors {
   }
 
   function output() {
-    throw new Exception('asd');
     foreach ($this->get() as $v) {
       print O::get('CliColors')->getColoredString(str_pad($v['name'], 13), 'green').date('d.m.Y H:i:s', $v['time'])."     ".O::get('CliColors')->getColoredString($v['body'], 'red')."\n";
       if (isset($v['url'])) print O::get('CliColors')->getColoredString('URL: '.$v['url'], 'cyan')."\n";
