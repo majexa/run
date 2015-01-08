@@ -1,5 +1,6 @@
 <?php
 
+define('TESTING', true);
 $params = implode(' ', array_slice($_SERVER['argv'], 1));
 $dir = __DIR__;
 if (isset($_SERVER['argv'][1]) and ($_SERVER['argv'][1] == 'proj' or $_SERVER['argv'][1] == 'plib')) {
