@@ -55,25 +55,25 @@ class ClRun {
   }
 
   protected function runner() {
-    return O::get('CliColors')->getColoredString('run', 'brown');
+    return CliColors::colored('run', 'brown');
   }
 
   protected function caption($text) {
-    return O::get('CliColors')->getColoredString('-- '.$text, 'cyan');
+    return CliColors::colored('-- '.$text, 'cyan');
   }
 
   protected function help() {
     Lib::enableCache();
-    print O::get('CliColors')->getColoredString('Универсальная точка запуска:', 'green')."\n";
-    if (!CliAccess::$disableDescription) print O::get('CliColors')->getColoredString('Supported commands:', 'yellow')."\n";
+    print CliColors::colored('Универсальная точка запуска:', 'green')."\n";
+    if (!CliAccess::$disableDescription) print CliColors::colored('Supported commands:', 'yellow')."\n";
     $methods = array_filter((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC), function (ReflectionMethod $m) {
       return $m->getName() != 'run' and !$m->isStatic();
     });
-    foreach ($methods as $method) print $this->runner().' '.$method->getName().(O::get('CliColors')->getColoredString(' -- Clears run envirnment cache', 'cyan'))."\n";
+    foreach ($methods as $method) print $this->runner().' '.$method->getName().(CliColors::colored(' -- Clears run envirnment cache', 'cyan'))."\n";
     print $this->runner().' cmd/path/code {ngnEnvLib}'."\n";
-    print $this->runner().' site projectName cmd/path/ngn'.(O::get('CliColors')->getColoredString(' -- cmd: "new Class()" / path: NGN_ENV_PATH/path/to/libOrFile / ngn: just type it', 'cyan'))."\n";
+    print $this->runner().' site projectName cmd/path/ngn'.(CliColors::colored(' -- cmd: "new Class()" / path: NGN_ENV_PATH/path/to/libOrFile / ngn: just type it', 'cyan'))."\n";
     if (!CliAccess::$disableDescription) {
-      print O::get('CliColors')->getColoredString('cmd/path variants:', 'yellow')."\n";
+      print CliColors::colored('cmd/path variants:', 'yellow')."\n";
       print "* (new Class('a'))->run()\n".
       "* /path/to/file\n".
       "* ci/1 ci\n".
