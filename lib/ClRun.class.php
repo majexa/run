@@ -2,6 +2,12 @@
 
 class ClRun {
 
+  protected $site;
+
+  function __construct($site = false) {
+    $this->site = $site;
+  }
+
   static function replace($path) {
     if ($path[0] != '/') $path = NGN_ENV_PATH.'/'.$path;
     foreach (['NGN_PATH', 'NGN_ENV_PATH'] as $v) $path = str_replace($v, constant($v), $path);
@@ -13,8 +19,9 @@ class ClRun {
       $this->help();
       return;
     }
+    $_SERVER['argv'] = array_merge([''], $args);
     Arr::checkEmpty($args, 0);
-    Err::setEntryCmd('run '.implode($args));
+    Err::setEntryCmd('run '.($this->site ? 'site '.$this->site.' ' : '').implode(' ',$args));
     $include = false;
     if (!$this->isCode($args[0]) and file_exists($args[0])) {
       // Если первый параметр - путь, смотрим вероятные файлы/папки для инициализации относительно него
@@ -34,7 +41,7 @@ class ClRun {
         require_once CORE_PATH.'/lib/cli/Cli.class.php';
         R::set('options', Cli::strParamsToArray($args[1]));
       }
-      else {
+      elseif (!$this->site) {
         $include = $args[1];
       }
     }
@@ -52,6 +59,7 @@ class ClRun {
     }
     if (file_exists(__DIR__.'/runConfig.php')) require_once __DIR__.'/runConfig.php';
     $this->processPath($args[0]);
+    Cli::storeCommand(RUN_PATH.'/logs');
   }
 
   protected function runner() {
@@ -74,12 +82,7 @@ class ClRun {
     print $this->runner().' site projectName cmd/path/ngn'.(CliColors::colored(' -- cmd: "new Class()" / path: NGN_ENV_PATH/path/to/libOrFile / ngn: just type it', 'cyan'))."\n";
     if (!CliAccess::$disableDescription) {
       print CliColors::colored('cmd/path variants:', 'yellow')."\n";
-      print "* (new Class('a'))->run()\n".
-      "* /path/to/file\n".
-      "* ci/1 ci\n".
-      "* '(new CiClass)->method()' ci\n".
-      "* NGN_ENV_PATH/path/to/file\n".
-      "* NGN_PATH/path/to/file\n";
+      print "* (new Class('a'))->run()\n"."* /path/to/file\n"."* ci/1 ci\n"."* '(new CiClass)->method()' ci\n"."* NGN_ENV_PATH/path/to/file\n"."* NGN_PATH/path/to/file\n";
     }
   }
 
@@ -106,22 +109,29 @@ class ClRun {
   protected function processPath($path) {
     if (method_exists($this, $path)) {
       $this->$path();
-      return;
-    }
-    if ($this->isCode($path)) { // eval
-      $code = trim($path);
-      if (($class = $this->parseClass($code))) {
-        if (!class_exists($class)) throw new Exception('Class "'.$class.'" not exists in code: '.$code);
-      }
-      if ($code[strlen($code) - 1] != ';') $code = "$code;";
-      eval($code);
     }
     else {
-      $path = self::replace($path.'.php');
-      if (!($_path = realpath($path))) throw new Exception("path '$path' not found");
-      include $_path;
+      if ($this->isCode($path)) { // eval
+        $code = trim($path);
+        if (($class = $this->parseClass($code))) {
+          if (!class_exists($class)) throw new Exception('Class "'.$class.'" not exists in code: '.$code);
+        }
+        if ($code[strlen($code) - 1] != ';') $code = "$code;";
+        eval($code);
+      }
+      else {
+        $_path = "$path.php";
+        $found = false;
+        foreach (Ngn::$basePaths as $basePath) {
+          if (file_exists("$basePath/cmd/$_path")) {
+            include "$basePath/cmd/$_path";
+            $found = true;
+            break;
+          }
+        }
+        if (!$found) throw new Exception("path '$path' not found");
+      }
     }
-    Cli::storeCommand(RUN_PATH.'/logs');
   }
 
 }

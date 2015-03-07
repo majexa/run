@@ -3,7 +3,7 @@
 
 if (isset($_SERVER['argv'][1]) and $_SERVER['argv'][1] == 'site') {
   require_once __DIR__.'/siteStandAloneInit.php';
-  (new ClRun)->run(array_slice($_SERVER['argv'], 3));
+  (new ClRun($_SERVER['argv'][2]))->run(array_slice($_SERVER['argv'], 3));
 }
 else {
   define('NGN_PATH', dirname(__DIR__).'/ngn');
