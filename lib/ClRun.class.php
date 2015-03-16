@@ -75,6 +75,7 @@ class ClRun {
     print CliColors::colored('Универсальная точка запуска:', 'green')."\n";
     if (!CliAccess::$disableDescription) print CliColors::colored('Supported commands:', 'yellow')."\n";
     $methods = array_filter((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC), function (ReflectionMethod $m) {
+      if ($m->isConstructor()) return false;
       return $m->getName() != 'run' and !$m->isStatic();
     });
     foreach ($methods as $method) print $this->runner().' '.$method->getName().(CliColors::colored(' -- Clears run envirnment cache', 'cyan'))."\n";
