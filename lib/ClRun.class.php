@@ -123,11 +123,19 @@ class ClRun {
       else {
         $_path = "$path.php";
         $found = false;
-        foreach (Ngn::$basePaths as $basePath) {
-          if (file_exists("$basePath/cmd/$_path")) {
-            include "$basePath/cmd/$_path";
-            $found = true;
-            break;
+        if ($_path[0] == '/') {
+          include $_path;
+          $found = true;
+        } elseif (file_exists(NGN_ENV_PATH.'/'.$_path)) {
+          include NGN_ENV_PATH.'/'.$_path;
+          $found = true;
+        } else {
+          foreach (Ngn::$basePaths as $basePath) {
+            if (file_exists("$basePath/cmd/$_path")) {
+              include "$basePath/cmd/$_path";
+              $found = true;
+              break;
+            }
           }
         }
         if (!$found) throw new Exception("path '$path' not found");
