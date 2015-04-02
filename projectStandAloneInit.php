@@ -8,10 +8,8 @@ define('NGN_ENV_PATH', dirname(__DIR__));
 define('NGN_PATH', NGN_ENV_PATH.'/ngn');
 define('WEBROOT_PATH', NGN_ENV_PATH.'/projects/'.$projectName);
 define('RUN_PATH', __DIR__);
-
-
+//define('IS_DEBUG', true);
 if (!file_exists(WEBROOT_PATH)) die($curFile."Webroot folder '".WEBROOT_PATH."' does not exists.\n");
-
 define('PROJECT_PATH', WEBROOT_PATH.'/site');
 
 require_once NGN_PATH.'/init/core.php';
@@ -19,9 +17,9 @@ Lib::addFolder(__DIR__.'/lib');
 
 R::set('plainText', true);
 
-require_once PROJECT_PATH.'/config/constants/core.php';
-require_once PROJECT_PATH.'/config/constants/more.php';
-require_once PROJECT_PATH.'/config/constants/site.php';
+Lib::requireIfExists(PROJECT_PATH.'/config/constants/core.php');
+Lib::requireIfExists(PROJECT_PATH.'/config/constants/more.php');
+Lib::requireIfExists(PROJECT_PATH.'/config/constants/site.php');
 
 require_once NGN_PATH.'/init/more.php';
 require_once NGN_PATH.'/init/cli.php';

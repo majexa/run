@@ -2,7 +2,7 @@
 <?php
 
 if (isset($_SERVER['argv'][1]) and $_SERVER['argv'][1] == 'site') {
-  require_once __DIR__.'/siteStandAloneInit.php';
+  require_once __DIR__.'/projectStandAloneInit.php';
   (new ClRun($_SERVER['argv'][2]))->run(array_slice($_SERVER['argv'], 3));
 }
 else {
