@@ -132,6 +132,7 @@ class ClRun {
         } else {
           foreach (Ngn::$basePaths as $basePath) {
             if (file_exists("$basePath/cmd/$_path")) {
+              //output3("$basePath/cmd/$_path");
               include "$basePath/cmd/$_path";
               $found = true;
               break;
