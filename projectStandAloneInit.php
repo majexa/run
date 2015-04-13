@@ -17,13 +17,7 @@ Lib::addFolder(__DIR__.'/lib');
 
 R::set('plainText', true);
 
-Lib::requireIfExists(PROJECT_PATH.'/config/constants/core.php');
-Lib::requireIfExists(PROJECT_PATH.'/config/constants/more.php');
-Lib::requireIfExists(PROJECT_PATH.'/config/constants/site.php');
-
-require_once NGN_PATH.'/init/more.php';
-require_once NGN_PATH.'/init/cli.php';
-require_once NGN_PATH.'/init/site.php';
+require_once NGN_PATH.'/init/project-cli.php';
 
 require_once __DIR__.'/lib/ClRun.class.php';
 if (file_exists(PROJECT_PATH.'/init.php')) require_once PROJECT_PATH.'/init.php';
