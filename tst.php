@@ -5,7 +5,7 @@ $params = implode(' ', array_slice($_SERVER['argv'], 1));
 $dir = __DIR__;
 if (isset($_SERVER['argv'][1]) and ($_SERVER['argv'][1] == 'proj' or $_SERVER['argv'][1] == 'plib')) {
   if (empty($_SERVER['argv'][3])) throw new Exception('projectName param #3 not defined');
-  if ($_SERVER['argv'][1] == 'proj' and $_SERVER['argv'][2] == 'g') {
+  if ($_SERVER['argv'][1] == 'proj' and $_SERVER['argv'][2] == 'g' and $_SERVER['argv'][3] == 'test') {
     $pm = 'php '.dirname($dir).'/pm/pm.php';
     print `$pm localServer createTestProject common`;
   }
