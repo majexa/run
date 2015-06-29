@@ -15,7 +15,7 @@ class ClRun {
   }
 
   function run(array $args) {
-      if (empty($args[0])) {
+    if (empty($args[0])) {
       $this->help();
       return;
     }
