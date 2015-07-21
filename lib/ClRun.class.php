@@ -22,18 +22,18 @@ class ClRun {
     $_SERVER['argv'] = array_merge([''], $args);
     Arr::checkEmpty($args, 0);
     Err::setEntryCmd('run '.($this->site ? 'site '.$this->site.' ' : '').implode(' ',$args));
-    $include = false;
+    $includes = false;
     if (!$this->isCode($args[0]) and file_exists($args[0])) {
       // Если первый параметр - путь, смотрим вероятные файлы/папки для инициализации относительно него
       $probableInitPath = dirname($args[0]).'/init.php';
       $probableLibFolder = dirname($args[0]);
       if (file_exists(self::replace($probableInitPath))) {
         output("Probable init path exists: $probableInitPath");
-        $include = $probableInitPath;
+        $includes = $probableInitPath;
       }
       elseif (file_exists(self::replace($probableLibFolder))) {
         output("Probable lib folder exists: $probableLibFolder");
-        $include = $probableLibFolder;
+        $includes = $probableLibFolder;
       }
     }
     if (!empty($args[1])) {
@@ -42,22 +42,23 @@ class ClRun {
         R::set('options', Cli::strParamsToArray($args[1]));
       }
       elseif (!$this->site) {
-        $include = $args[1];
+        $includes = $args[1];
       }
     }
-    if ($include) {
-      $include = self::replace($include);
-      $probableInitPath = $include.'/init.php';
-      Err::$errorExtra['asd'] = '%^$';
-      Err::$errorExtra['argv'] = getPrr($_SERVER['argv']);
-      if (!Misc::hasSuffix('.php', $include)) Lib::addFolder($include);
-      Lib::enableCache($include);
-      if (Misc::hasSuffix('.php', $include)) require_once $include;
-      if (file_exists($probableInitPath)) require $probableInitPath;
+    if ($includes) {
+      foreach (explode(',', $includes) as $include) {
+        $include = self::replace($include);
+        $probableInitPath = $include.'/init.php';
+        Err::$errorExtra['argv'] = getPrr($_SERVER['argv']);
+        if (!Misc::hasSuffix('.php', $include)) Lib::addFolder($include);
+        Lib::enableCache($include);
+        if (Misc::hasSuffix('.php', $include)) require_once $include;
+        if (file_exists($probableInitPath)) require $probableInitPath;
+      }
     }
     else {
       require RUN_PATH.'/defaultInit.php';
-      Lib::enableCache($include);
+      Lib::enableCache($includes);
     }
     if (file_exists(__DIR__.'/runConfig.php')) require_once __DIR__.'/runConfig.php';
     $this->processPath($args[0]);
