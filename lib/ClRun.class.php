@@ -51,10 +51,10 @@ class ClRun {
         $probableInitPath = $include.'/init.php';
         Err::$errorExtra['argv'] = getPrr($_SERVER['argv']);
         if (!Misc::hasSuffix('.php', $include)) Lib::addFolder($include);
-        Lib::enableCache($include);
         if (Misc::hasSuffix('.php', $include)) require_once $include;
         if (file_exists($probableInitPath)) require $probableInitPath;
       }
+      Lib::enableCache($includes);
     }
     else {
       require RUN_PATH.'/defaultInit.php';
