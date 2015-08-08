@@ -1,4 +1,4 @@
 #!/bin/bash
 # ngn
 
-/usr/bin/php /home/user/ngn-env/run/run.php "$@"
+/usr/bin/php ~/ngn-env/run/run.php "$@"
