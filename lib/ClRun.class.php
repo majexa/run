@@ -23,8 +23,10 @@ class ClRun {
     Arr::checkEmpty($args, 0);
     Err::setEntryCmd('run '.($this->site ? 'site '.$this->site.' ' : '').implode(' ',$args));
     $includes = false;
+    $directFile = null;
     if (!$this->isCode($args[0]) and file_exists($args[0])) {
       // Если первый параметр - путь, смотрим вероятные файлы/папки для инициализации относительно него
+      $directFile = $args[0];
       $probableInitPath = dirname($args[0]).'/init.php';
       $probableLibFolder = dirname($args[0]);
       if (file_exists(self::replace($probableInitPath))) {
@@ -41,7 +43,8 @@ class ClRun {
         require_once CORE_PATH.'/lib/cli/Cli.class.php';
         R::set('options', Cli::strParamsToArray($args[1]));
       }
-      elseif (!$this->site) {
+      //elseif (!$this->site) {
+      else {
         $includes = $args[1];
       }
     }
@@ -61,7 +64,11 @@ class ClRun {
       Lib::enableCache($includes);
     }
     if (file_exists(__DIR__.'/runConfig.php')) require_once __DIR__.'/runConfig.php';
-    $this->processPath($args[0]);
+    if ($directFile) {
+      include $directFile;
+    } else {
+      $this->processFirstArg($args[0]);
+    }
     Cli::storeCommand(RUN_PATH.'/logs');
   }
 
@@ -82,11 +89,18 @@ class ClRun {
       return $m->getName() != 'run' and !$m->isStatic();
     });
     foreach ($methods as $method) print $this->runner().' '.$method->getName().(CliColors::colored(' -- Clears run envirnment cache', 'cyan'))."\n";
-    print $this->runner().' cmd/path/code {ngnEnvLib}'."\n";
-    print $this->runner().' site projectName cmd/path/ngn'.(CliColors::colored(' -- cmd: "new Class()" / path: NGN_ENV_PATH/path/to/libOrFile / ngn: just type it', 'cyan'))."\n";
+    print $this->runner().' path/cmd/code {options/lib}'."\n";
+    print $this->runner().' site projectName path/cmd/code'."\n";
     if (!CliAccess::$disableDescription) {
-      print CliColors::colored('cmd/path variants:', 'yellow')."\n";
-      print "* (new Class('a'))->run()\n"."* /path/to/file\n"."* ci/1 ci\n"."* '(new CiClass)->method()' ci\n"."* NGN_ENV_PATH/path/to/file\n"."* NGN_PATH/path/to/file\n";
+      print CliColors::colored('path/cmd/code variants:', 'yellow')."\n";
+      print //
+        "  /path/to/file\n". //
+        "  ci/1 ci\n". //
+        "  NGN_ENV_PATH/path/to/file\n". //
+        "  NGN_PATH/path/to/file\n". //
+        "  someFileInCmdFolder\n". //
+        "  \"(new Class('a'))->run()\"\n". //
+        "  \"(new CiClass)->method()\" ci\n"; //
     }
   }
 
@@ -110,13 +124,14 @@ class ClRun {
     return false;
   }
 
-  protected function processPath($path) {
-    if (method_exists($this, $path)) {
-      $this->$path();
+  protected function processFirstArg($firstArg) {
+    if (method_exists($this, $firstArg)) {
+      $this->$firstArg();
     }
     else {
-      if ($this->isCode($path)) { // eval
-        $code = trim($path);
+      if ($this->isCode($firstArg)) {
+        // code eval
+        $code = trim($firstArg);
         if (($class = $this->parseClass($code))) {
           if (!class_exists($class)) throw new Exception('Class "'.$class.'" not exists in code: '.$code);
         }
@@ -124,25 +139,24 @@ class ClRun {
         eval($code);
       }
       else {
-        $_path = "$path.php";
+        $path = $firstArg.'.php';
         $found = false;
-        if ($_path[0] == '/') {
-          include $_path;
+        if ($path[0] == '/') {
+          include $path;
           $found = true;
-        } elseif (file_exists(NGN_ENV_PATH.'/'.$_path)) {
-          include NGN_ENV_PATH.'/'.$_path;
+        } elseif (file_exists(NGN_ENV_PATH.'/'.$path)) {
+          include NGN_ENV_PATH.'/'.$path;
           $found = true;
         } else {
           foreach (Ngn::$basePaths as $basePath) {
-            if (file_exists("$basePath/cmd/$_path")) {
-              //output3("$basePath/cmd/$_path");
-              include "$basePath/cmd/$_path";
+            if (file_exists("$basePath/cmd/$path")) {
+              include "$basePath/cmd/$path";
               $found = true;
               break;
             }
           }
         }
-        if (!$found) throw new Exception("path '$path' not found");
+        if (!$found) throw new Exception("path '$firstArg' not found");
       }
     }
   }
