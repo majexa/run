@@ -24,6 +24,7 @@ class ClRun {
     Err::setEntryCmd('run '.($this->site ? 'site '.$this->site.' ' : '').implode(' ',$args));
     $includes = false;
     $directFile = null;
+    $quietly = false;
     if (!$this->isCode($args[0]) and file_exists($args[0])) {
       // Если первый параметр - путь, смотрим вероятные файлы/папки для инициализации относительно него
       $directFile = $args[0];
@@ -39,21 +40,24 @@ class ClRun {
       }
     }
     if (!empty($args[1])) {
-      if ($this->isOptionsArg($args[1])) {
-        require_once CORE_PATH.'/lib/cli/Cli.class.php';
-        R::set('options', Cli::strParamsToArray($args[1]));
-      }
-      //elseif (!$this->site) {
-      else {
-        $includes = $args[1];
+      if ($args[1] == 'quietly') {
+        $quietly = true;
+      } else {
+        if ($this->isOptionsArg($args[1])) {
+          require_once CORE_PATH.'/lib/cli/Cli.class.php';
+          R::set('options', Cli::strParamsToArray($args[1]));
+        }
+        else {
+          $includes = $args[1];
+        }
       }
     }
+    if (!empty($args[2]) and $args[2] == 'quietly') $quietly = true;
     if ($includes) {
       foreach (explode(',', $includes) as $include) {
         $include = self::replace($include);
         $probableInitPath = $include.'/init.php';
         Err::$errorExtra['argv'] = getPrr($_SERVER['argv']);
-        if (!Misc::hasSuffix('.php', $include)) Lib::addFolder($include);
         if (Misc::hasSuffix('.php', $include)) require_once $include;
         if (file_exists($probableInitPath)) require $probableInitPath;
       }
@@ -67,7 +71,7 @@ class ClRun {
     if ($directFile) {
       include $directFile;
     } else {
-      $this->processFirstArg($args[0]);
+      $this->processFirstArg($args[0], $quietly);
     }
     Cli::storeCommand(RUN_PATH.'/logs');
   }
@@ -124,7 +128,7 @@ class ClRun {
     return false;
   }
 
-  protected function processFirstArg($firstArg) {
+  protected function processFirstArg($firstArg, $quietly) {
     if (method_exists($this, $firstArg)) {
       $this->$firstArg();
     }
@@ -156,7 +160,7 @@ class ClRun {
             }
           }
         }
-        if (!$found) throw new Exception("path '$firstArg' not found");
+        if (!$found and !$quietly) throw new Exception("path '$firstArg' not found");
       }
     }
   }
