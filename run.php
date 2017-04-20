@@ -10,6 +10,7 @@ else {
   define('NGN_ENV_PATH', dirname(__DIR__));
   define('PROJECT_KEY', 'run');
   define('LOGS_PATH', __DIR__.'/logs');
+  define('LOG_OUTPUT', false);
   define('DATA_PATH', __DIR__.'/data');
   define('RUN_PATH', __DIR__);
   define('PROJECT_PATH', RUN_PATH);
