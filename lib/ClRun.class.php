@@ -74,7 +74,7 @@ class ClRun {
     } else {
       $this->processFirstArg($args[0], $quietly);
     }
-    Cli::storeCommand(RUN_PATH.'/logs');
+    // Cli::storeCommand(RUN_PATH.'/logs');
   }
 
   protected function runner() {
